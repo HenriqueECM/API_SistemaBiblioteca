@@ -4,14 +4,14 @@ public class Livro {
     private int id, anoPublicacao;
     private String titulo, autor;
 
-    public Livro(int id, int anoPublicacao, String titulo, String autor) {
+    public Livro(int id, String titulo, String autor, int anoPublicacao) {
         this.id = id;
         this.anoPublicacao = anoPublicacao;
         this.titulo = titulo;
         this.autor = autor;
     }
 
-    public Livro(int anoPublicacao, String titulo, String autor) {
+    public Livro(String titulo, String autor, int anoPublicacao) {
         this.anoPublicacao = anoPublicacao;
         this.titulo = titulo;
         this.autor = autor;
