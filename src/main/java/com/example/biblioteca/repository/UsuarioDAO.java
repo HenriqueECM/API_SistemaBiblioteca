@@ -1,7 +1,6 @@
 package com.example.biblioteca.repository;
 
 import com.example.biblioteca.database.Conexao;
-import com.example.biblioteca.model.Livro;
 import com.example.biblioteca.model.Usuario;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +10,7 @@ import java.util.List;
 
 @Repository
 public class UsuarioDAO {
-    public void insert (Usuario usuario) throws SQLException {
+    public Usuario insert (Usuario usuario) throws SQLException {
         String query = "INSERT INTO usuario (nome, email) VALUES(?,?)";
 
         try (Connection conn = Conexao.conectar();
@@ -24,6 +23,7 @@ public class UsuarioDAO {
 
             System.out.println("Usuário inserido com sucesso!");
         }
+        return usuario;
     }
 
     public List<Usuario> buscarTodos() throws SQLException{
