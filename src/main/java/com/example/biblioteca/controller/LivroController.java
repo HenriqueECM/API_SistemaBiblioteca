@@ -67,8 +67,6 @@ public class LivroController {
 
     @DeleteMapping("/{id}")
     public void deleteLivro(@PathVariable int id){
-        Livro newLivro = new Livro();
-
         try {
             service.deleteLivro(id);
         } catch (SQLException e) {
