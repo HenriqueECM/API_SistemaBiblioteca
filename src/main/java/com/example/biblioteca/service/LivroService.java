@@ -28,6 +28,7 @@ public class LivroService {
     // buscar por id
     public Livro listById(int id) throws SQLException {
         List<Livro> livroList = repository.buscarTodos();
+
         for (Livro livro : livroList){
             if (livro.getId() == id){
                 return repository.buscarPorId(id);

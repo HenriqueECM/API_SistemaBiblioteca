@@ -22,6 +22,12 @@ public class LivroDAO {
             stmt.setInt(3, livro.getAnoPublicacao());
             stmt.executeUpdate();
 
+            ResultSet rs = stmt.getGeneratedKeys();
+
+            if (rs.next()){
+                livro.setId(rs.getInt(1));
+            }
+
             System.out.println("Livro inserido com sucesso!");
         }
         return livro;
@@ -51,7 +57,7 @@ public class LivroDAO {
     public Livro buscarPorId(int id) throws SQLException{
         String query = "SELECT id, titulo, autor, ano_publicacao FROM livro WHERE id = ?";
 
-        int newID = 0;
+        int newId = 0;
         String titulo = "";
         String autor = "";
         int anoPublicacao = 0;
@@ -63,13 +69,13 @@ public class LivroDAO {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()){
-                newID = rs.getInt("id");
+                newId = rs.getInt("id");
                 titulo = rs.getString("titulo");
                 autor = rs.getString("autor");
                 anoPublicacao = rs.getInt("ano_publicacao");
             }
         }
-        return new Livro(newID, titulo, autor, anoPublicacao);
+        return new Livro(newId, titulo, autor, anoPublicacao);
     }
 
     public void atualizar (Livro livro) throws SQLException {
