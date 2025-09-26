@@ -40,15 +40,15 @@ public class EmprestimoService {
     }
 
     // buscar emprestimo de um usuário especifico
-    public Emprestimo listById(int idUsuario) throws SQLException {
+    public Emprestimo listById(int id) throws SQLException {
         List<Emprestimo> emprestimoList = repository.buscarTodos();
 
         for (Emprestimo e : emprestimoList){
-            if (e.getUsuarioId() == idUsuario){
-                return repository.buscarPorId(idUsuario);
+            if (e.getId() == id){
+                return repository.buscarPorId(id);
             }
         }
-        throw new RuntimeException("O emprestimo de ID " + idUsuario +  " não existe.");
+        throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
     }
 
     // finalizar o emprestimo
@@ -77,5 +77,6 @@ public class EmprestimoService {
                 repository.atualizar(id, emprestimo);
             }
         }
+        throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
     }
 }

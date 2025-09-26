@@ -15,7 +15,7 @@ import java.util.List;
 @Repository
 public class EmprestimoDAO {
     public Emprestimo insert (Emprestimo emprestimo) throws SQLException {
-        String query = "INSERT INTO emprestimo (livro_id, usuario_id, data_emprestimo, data_devolucao) VALUES(?,?,?,?)";
+        String query = "INSERT INTO emprestimo (livro_id, usuario_id, data_emprestimo) VALUES(?,?,?)";
 
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
@@ -23,8 +23,13 @@ public class EmprestimoDAO {
             stmt.setInt(1, emprestimo.getLivroId());
             stmt.setInt(2, emprestimo.getUsuarioId());
             stmt.setDate(3, Date.valueOf(emprestimo.getDataEmprestimo()));
-            stmt.setDate(4, Date.valueOf(emprestimo.getDataDevolucao()));
             stmt.executeUpdate();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+
+            if (rs.next()){
+                emprestimo.setId(rs.getInt(1));
+            }
 
             System.out.println("Emprestimo inserido com sucesso!");
         }
@@ -32,7 +37,7 @@ public class EmprestimoDAO {
     }
 
     public List<Emprestimo> buscarTodos() throws SQLException{
-        String query = "SELECT id, livro_id, usuario_id, data_emprestimo, data_devolucao FROM emprestimo";
+        String query = "SELECT id, livro_id, usuario_id, data_emprestimo, data_devolucao FROM emprestimo WHERE data_devolucao = null";
 
         List<Emprestimo> emprestimoList = new ArrayList<>();
 
@@ -54,31 +59,31 @@ public class EmprestimoDAO {
         return emprestimoList;
     }
 
-    public Emprestimo buscarPorId(int idUsuario) throws SQLException{
-        String query = "SELECT id, livro_id, usuario_id, data_emprestimo, data_devolucao FROM emprestimo WHERE usuario_id = ?";
+    public Emprestimo buscarPorId(int id) throws SQLException{
+        String query = "SELECT id, livro_id, usuario_id, data_emprestimo, data_devolucao FROM emprestimo WHERE id = ?";
 
-        int id = 0;
+        int newId = 0;
         int idLivro = 0;
-        int newIdUsuario = 0;
+        int idUsuario = 0;
         Date dataEmprestimo = null;
         Date dataDevolucao = null;
 
         try(Connection conn = Conexao.conectar();
             PreparedStatement stmt = conn.prepareStatement(query)){
 
-            stmt.setInt(1, idUsuario);
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()){
-                id = rs.getInt("id");
+                newId = rs.getInt("id");
                 idLivro = rs.getInt("livro_id");
-                newIdUsuario = rs.getInt("usuario_id");
+                idUsuario = rs.getInt("usuario_id");
                 dataEmprestimo = rs.getDate("data_emprestimo");
                 dataDevolucao = rs.getDate("data_devolucao");
 
             }
         }
-        return new Emprestimo(id, idLivro, newIdUsuario, dataEmprestimo.toLocalDate(), dataDevolucao.toLocalDate());
+        return new Emprestimo(newId, idLivro, idUsuario, dataEmprestimo.toLocalDate(), dataDevolucao.toLocalDate());
     }
 
     // para mudar data prevista

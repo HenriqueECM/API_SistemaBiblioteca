@@ -23,6 +23,10 @@ public class Emprestimo {
         this.dataDevolucao = dataDevolucao;
     }
 
+    public Emprestimo() {
+
+    }
+
     public int getId() {
         return id;
     }

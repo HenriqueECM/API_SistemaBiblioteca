@@ -18,8 +18,13 @@ public class UsuarioDAO {
 
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getEmail());
-
             stmt.executeUpdate();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+
+            if (rs.next()){
+                usuario.setId(rs.getInt(1));
+            }
 
             System.out.println("Usuário inserido com sucesso!");
         }
