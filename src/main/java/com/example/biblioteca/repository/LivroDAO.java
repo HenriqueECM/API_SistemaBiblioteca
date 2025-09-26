@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public class LivroDAO {
 
-    public void insert (Livro livro) throws SQLException {
+    public Livro insert (Livro livro) throws SQLException {
         String query = "INSERT INTO livro (titulo, autor, ano_publicacao) VALUES(?,?,?)";
 
         try (Connection conn = Conexao.conectar();
@@ -24,6 +24,7 @@ public class LivroDAO {
 
             System.out.println("Livro inserido com sucesso!");
         }
+        return livro;
     }
 
     public List<Livro> buscarTodos() throws SQLException{
