@@ -50,7 +50,9 @@ public class EmprestimoDAO {
                 int idUsuario = rs.getInt("usuario_id");
                 Date dataEmprestimo = rs.getDate("data_emprestimo");
                 dataDevolucao = rs.getDate("data_devolucao");
+
                 var emprestimo = new Emprestimo();
+
                 if(dataDevolucao == null) {
                     emprestimo = new Emprestimo(id, idLivro, idUsuario, dataEmprestimo.toLocalDate(), null);
                 }else{
