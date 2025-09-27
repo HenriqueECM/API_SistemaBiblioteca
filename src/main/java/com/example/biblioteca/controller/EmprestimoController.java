@@ -31,7 +31,7 @@ public class EmprestimoController {
         return newEmprestimo;
     }
 
-    // listar todos emprestimos
+    // listar todos emprestimos - teste ok
     @GetMapping
     public List<Emprestimo> getEmprestimo(){
         List<Emprestimo> emprestimoList = new ArrayList<>();
@@ -60,7 +60,7 @@ public class EmprestimoController {
     // vai alterar a data prevista
     @PutMapping("/{id}/emprestimo")
     // quando so vou atualizar data somente, colocar void, pois com return ele retorna o "objeto"
-    public void updateEmprestimo (@PathVariable int id, @RequestBody LocalDate emprestimo){
+    public void updateEmprestimo (@PathVariable int id, @RequestBody Emprestimo emprestimo){
 
         try {
             service.updateEmprestimo(id, emprestimo);
@@ -69,7 +69,7 @@ public class EmprestimoController {
         }
     }
 
-    // deletar o emprestimo
+    // deletar o emprestimo - teste ok
     @DeleteMapping("/{id}")
     public void deleteEmprestimo (@PathVariable int id){
 
@@ -82,10 +82,10 @@ public class EmprestimoController {
 
     // vai alterar a data devolução
     @PutMapping("/{id}/devolucao")
-    public void updateEmprestimoDevolucao(@PathVariable int id, @RequestBody LocalDate devolucao){
+    public void updateEmprestimoDevolucao(@PathVariable int id, @RequestBody Emprestimo emprestimo){
 
         try {
-            service.updateEmprestimoDevolucao(id, devolucao);
+            service.updateEmprestimoDevolucao(id, emprestimo);
         } catch (SQLException e){
             e.printStackTrace();
         }
