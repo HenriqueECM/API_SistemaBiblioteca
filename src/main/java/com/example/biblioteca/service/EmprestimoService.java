@@ -19,16 +19,6 @@ public class EmprestimoService {
         this.repository = repository;
     }
 
-    // testando componente para refatorar uso de for em todos metodos
-    public void verificar(int id) throws SQLException {
-        List<Emprestimo> emprestimoList = repository.buscarTodos();
-        for (Emprestimo e : emprestimoList){
-            if (e.getId() == id){
-                return;
-            }
-        }
-        throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");    }
-
     // cadastrar emprestimo
     public Emprestimo createEmprestimo(Emprestimo emprestimo) throws SQLException {
         return repository.insert(emprestimo);
@@ -52,12 +42,14 @@ public class EmprestimoService {
     }
 
     // finalizar o emprestimo
-    public void updateEmprestimoDevolucao (int id, LocalDate devolucao) throws SQLException {
+    public Emprestimo updateEmprestimoDevolucao (int id, Emprestimo emprestimo) throws SQLException {
         List<Emprestimo> emprestimoList = repository.buscarTodos();
 
+        emprestimo.setId(id);
         for (Emprestimo e : emprestimoList){
-            if (e.getUsuarioId() == id){
-                 repository.atualizarDevolucao(id, devolucao);
+            if (e.getId() == id){
+                 repository.atualizarDevolucao(emprestimo);
+                 return emprestimo;
             }
         }
         throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
@@ -65,16 +57,26 @@ public class EmprestimoService {
 
     // deletar o emprestimo
     public void deleteEmprestimo (int id) throws SQLException {
-        verificar(id);
-        repository.deletar(id);
+        List<Emprestimo> emprestimoList = repository.buscarTodos();
+
+        for (Emprestimo e : emprestimoList){
+            if (e.getId() == id){
+                repository.deletar(id);
+                return;
+            }
+        }
+        throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
     }
 
     // atualizar data prevista
-    public void updateEmprestimo(int id, LocalDate emprestimo) throws SQLException {
+    public Emprestimo updateEmprestimo(int id, Emprestimo emprestimo) throws SQLException {
         List<Emprestimo> emprestimoList = repository.buscarTodos();
+
+        emprestimo.setId(id);
         for (Emprestimo e : emprestimoList){
             if (e.getId() == id){
-                repository.atualizar(id, emprestimo);
+                repository.atualizar(emprestimo);
+                return emprestimo;
             }
         }
         throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
