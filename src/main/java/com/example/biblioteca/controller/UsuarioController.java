@@ -2,6 +2,8 @@ package com.example.biblioteca.controller;
 
 import com.example.biblioteca.model.Usuario;
 import com.example.biblioteca.service.UsuarioService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -18,7 +20,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public Usuario createUser (@RequestBody Usuario usuario){
+    public ResponseEntity <Usuario> createUser (@RequestBody Usuario usuario){
         Usuario newUser = new Usuario();
 
         try {
@@ -26,11 +28,12 @@ public class UsuarioController {
         } catch (SQLException e){
             e.printStackTrace();
         }
-        return newUser;
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(newUser);
     }
 
     @GetMapping
-    public List<Usuario> getUser(){
+    public ResponseEntity <List<Usuario>> getUser(){
         List<Usuario> usuarioList = new ArrayList<>();
 
         try{
@@ -38,11 +41,12 @@ public class UsuarioController {
         } catch (SQLException e){
             e.printStackTrace();
         }
-        return usuarioList;
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(usuarioList);
     }
 
     @GetMapping("/{id}")
-    public Usuario getById(@PathVariable int id){
+    public ResponseEntity <Usuario> getById(@PathVariable int id){
         Usuario newUser = new Usuario();
 
         try {
@@ -50,11 +54,12 @@ public class UsuarioController {
         } catch (SQLException e){
             e.printStackTrace();
         }
-        return newUser;
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(newUser);
     }
 
     @PutMapping("/{id}")
-    public Usuario updateUser(@PathVariable int id, @RequestBody Usuario usuario){
+    public ResponseEntity <Usuario> updateUser(@PathVariable int id, @RequestBody Usuario usuario){
         Usuario newUser = new Usuario();
 
         try{
@@ -62,15 +67,18 @@ public class UsuarioController {
         } catch (SQLException e){
             e.printStackTrace();
         }
-        return newUser;
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(newUser);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable int id){
+    public ResponseEntity <Void> deleteUser(@PathVariable int id){
         try{
             service.deleteUser(id);
         } catch (SQLException e){
             e.printStackTrace();
         }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }
