@@ -1,5 +1,8 @@
 package com.example.biblioteca.service;
 
+import com.example.biblioteca.dto.usuario.CriacaoUsuarioRespostaDto;
+import com.example.biblioteca.dto.usuario.CriacaorUsuarioRequisicaoDto;
+import com.example.biblioteca.mapper.UsuarioMapper;
 import com.example.biblioteca.model.Usuario;
 import com.example.biblioteca.repository.UsuarioDAO;
 import org.springframework.stereotype.Service;
@@ -10,14 +13,16 @@ import java.util.List;
 @Service
 public class UsuarioService {
     private final UsuarioDAO repository;
+    private final UsuarioMapper mapper;
 
-    public UsuarioService (UsuarioDAO repository){
+    public UsuarioService (UsuarioDAO repository, UsuarioMapper mapper){
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     // criar usuario
-    public Usuario createUser(Usuario usuario) throws SQLException {
-        return repository.insert(usuario);
+    public CriacaoUsuarioRespostaDto createUser(CriacaorUsuarioRequisicaoDto requisicaoDto) throws SQLException {
+        return mapper.paraResposta(repository.insert(mapper.paraEntidade(requisicaoDto)));
     }
 
     // listar todos usuarios

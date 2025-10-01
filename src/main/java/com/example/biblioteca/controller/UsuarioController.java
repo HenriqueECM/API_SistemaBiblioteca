@@ -1,7 +1,10 @@
 package com.example.biblioteca.controller;
 
+import com.example.biblioteca.dto.usuario.CriacaoUsuarioRespostaDto;
+import com.example.biblioteca.dto.usuario.CriacaorUsuarioRequisicaoDto;
 import com.example.biblioteca.model.Usuario;
 import com.example.biblioteca.service.UsuarioService;
+import org.apache.catalina.valves.JsonErrorReportValve;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,16 +23,17 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity <Usuario> createUser (@RequestBody Usuario usuario){
+    public ResponseEntity <CriacaoUsuarioRespostaDto> createUser (@RequestBody CriacaorUsuarioRequisicaoDto requisicaoUsuario){
         Usuario newUser = new Usuario();
 
         try {
-            newUser = service.createUser(usuario);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(service.createUser(requisicaoUsuario));
         } catch (SQLException e){
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(newUser);
     }
 
     @GetMapping
