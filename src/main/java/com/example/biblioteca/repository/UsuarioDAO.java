@@ -73,7 +73,23 @@ public class UsuarioDAO {
         return new Usuario(newID, nome, email);
     }
 
-    public void atualizar (Usuario usuario) throws SQLException {
+    public boolean usuarioExiste(int id) throws SQLException{
+        String query = "SELECT id FROM usuario WHERE id = ?";
+
+        try(Connection conn = Conexao.conectar();
+            PreparedStatement stmt = conn.prepareStatement(query)){
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Usuario atualizar (Usuario usuario) throws SQLException {
         String query = "UPDATE usuario SET nome = ?, email = ? WHERE id = ?";
 
         try (Connection conn = Conexao.conectar();
@@ -87,6 +103,7 @@ public class UsuarioDAO {
 
             System.out.println("Usuario atualizado com sucesso!");
         }
+        return usuario;
     }
 
     public void deletar (int id) throws SQLException {

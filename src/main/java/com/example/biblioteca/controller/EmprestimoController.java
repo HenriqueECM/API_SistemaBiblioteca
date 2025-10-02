@@ -1,7 +1,12 @@
 package com.example.biblioteca.controller;
 
+import com.example.biblioteca.dto.emprestimo.CriacaoEmprestimoRequisicaoDto;
+import com.example.biblioteca.dto.emprestimo.CriacaoEmprestimoRespostaDto;
+import com.example.biblioteca.dto.livro.CriacaoLivroRespostaDto;
 import com.example.biblioteca.model.Emprestimo;
 import com.example.biblioteca.service.EmprestimoService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -20,74 +25,82 @@ public class EmprestimoController {
 
     // criar o emprestimo - teste ok
     @PostMapping
-    public Emprestimo createEmprestimo (@RequestBody Emprestimo emprestimo){
-        Emprestimo newEmprestimo = new Emprestimo();
-
+    public ResponseEntity <CriacaoEmprestimoRespostaDto> createEmprestimo (@RequestBody CriacaoEmprestimoRequisicaoDto requisicaoEmprestimo){
         try{
-            newEmprestimo = service.createEmprestimo(emprestimo);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(service.create(requisicaoEmprestimo));
         } catch (SQLException e){
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
-        return newEmprestimo;
     }
 
     // listar todos emprestimos - teste ok
     @GetMapping
-    public List<Emprestimo> getEmprestimo(){
-        List<Emprestimo> emprestimoList = new ArrayList<>();
-
+    public ResponseEntity <List<CriacaoEmprestimoRespostaDto>> getEmprestimo(){
         try{
-            emprestimoList = service.listEmprestimo();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(service.buscarTodos());
         } catch (SQLException e){
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
-        return emprestimoList;
+
     }
 
     // busca por id
     @GetMapping("/{id}")
-    public Emprestimo getById(@PathVariable int id){
-        Emprestimo newEmprestimo = new Emprestimo();
-
+    public ResponseEntity <CriacaoEmprestimoRespostaDto> getById(@PathVariable int id){
         try {
-            newEmprestimo = service.listById(id);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(service.buscarPorId(id));
         } catch (SQLException e){
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
-        return newEmprestimo;
     }
 
     // vai alterar a data prevista
     @PutMapping("/{id}/emprestimo")
     // quando so vou atualizar data somente, colocar void, pois com return ele retorna o "objeto"
-    public void updateEmprestimo (@PathVariable int id, @RequestBody Emprestimo emprestimo){
-
+    public ResponseEntity <CriacaoEmprestimoRespostaDto> updateEmprestimo (@PathVariable int id, @RequestBody CriacaoEmprestimoRequisicaoDto requisicaoEmprestimo){
         try {
-            service.updateEmprestimo(id, emprestimo);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(service.updateEmprestimo(id,requisicaoEmprestimo));
         } catch (SQLException e){
             e.printStackTrace();
-        }
-    }
-
-    // deletar o emprestimo - teste ok
-    @DeleteMapping("/{id}")
-    public void deleteEmprestimo (@PathVariable int id){
-
-        try {
-            service.deleteEmprestimo(id);
-        } catch (SQLException e){
-            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
     }
 
     // vai alterar a data devolução
     @PutMapping("/{id}/devolucao")
-    public void updateEmprestimoDevolucao(@PathVariable int id, @RequestBody Emprestimo emprestimo){
-
+    public ResponseEntity <CriacaoEmprestimoRespostaDto> updateEmprestimoDevolucao(@PathVariable int id, @RequestBody CriacaoEmprestimoRequisicaoDto requisicaoEmprestimo){
         try {
-            service.updateEmprestimoDevolucao(id, emprestimo);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(service.updateDevolucao(id,requisicaoEmprestimo));
         } catch (SQLException e){
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    // deletar o emprestimo - teste ok
+    @DeleteMapping("/{id}")
+    public ResponseEntity <Void> deleteEmprestimo (@PathVariable int id){
+        try {
+            service.delete(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .build();
+        } catch (SQLException e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
     }
 }

@@ -24,11 +24,9 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity <CriacaoUsuarioRespostaDto> createUser (@RequestBody CriacaorUsuarioRequisicaoDto requisicaoUsuario){
-        Usuario newUser = new Usuario();
-
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(service.createUser(requisicaoUsuario));
+                    .body(service.create(requisicaoUsuario));
         } catch (SQLException e){
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -37,52 +35,50 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public ResponseEntity <List<Usuario>> getUser(){
-        List<Usuario> usuarioList = new ArrayList<>();
-
+    public ResponseEntity <List<CriacaoUsuarioRespostaDto>> getUser(){
         try{
-            usuarioList = service.listUser();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(service.buscarTodos());
         } catch (SQLException e){
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(usuarioList);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity <Usuario> getById(@PathVariable int id){
-        Usuario newUser = new Usuario();
-
+    public ResponseEntity <CriacaoUsuarioRespostaDto> getById(@PathVariable int id){
         try {
-            newUser = service.listById(id);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(service.buscarPorId(id));
         } catch (SQLException e){
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(newUser);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity <Usuario> updateUser(@PathVariable int id, @RequestBody Usuario usuario){
-        Usuario newUser = new Usuario();
-
+    public ResponseEntity <CriacaoUsuarioRespostaDto> updateUser(@PathVariable int id, @RequestBody CriacaorUsuarioRequisicaoDto requisicaoUsuario){
         try{
-            newUser = service.updateUser(id, usuario);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(service.update(id, requisicaoUsuario));
         } catch (SQLException e){
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(newUser);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity <Void> deleteUser(@PathVariable int id){
+    public ResponseEntity<Void> deleteUser(@PathVariable int id){
         try{
-            service.deleteUser(id);
-        } catch (SQLException e){
-            e.printStackTrace();
+            service.delete(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .build();
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .build();
     }
 }

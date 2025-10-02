@@ -1,81 +1,81 @@
 package com.example.biblioteca.service;
 
+import com.example.biblioteca.dto.emprestimo.CriacaoEmprestimoRequisicaoDto;
+import com.example.biblioteca.dto.emprestimo.CriacaoEmprestimoRespostaDto;
+import com.example.biblioteca.mapper.EmprestimoMapper;
 import com.example.biblioteca.model.Emprestimo;
 import com.example.biblioteca.repository.EmprestimoDAO;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class EmprestimoService {
     private final EmprestimoDAO repository;
+    private final EmprestimoMapper mapper;
 
-    public EmprestimoService(EmprestimoDAO repository) {
+    public EmprestimoService(EmprestimoDAO repository, EmprestimoMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     // cadastrar emprestimo
-    public Emprestimo createEmprestimo(Emprestimo emprestimo) throws SQLException {
-        return repository.insert(emprestimo);
+    public CriacaoEmprestimoRespostaDto create(CriacaoEmprestimoRequisicaoDto requisicaoDto) throws SQLException {
+        return mapper.paraResposta(repository.insert(mapper.paraEntidade(requisicaoDto)));
     }
 
     // listar todos emprestimos
-    public List<Emprestimo> listEmprestimo () throws SQLException {
-        return repository.buscarTodos();
+    public List<CriacaoEmprestimoRespostaDto> buscarTodos () throws SQLException {
+        List<CriacaoEmprestimoRespostaDto> respostaDtos = new ArrayList<>();
+        List<Emprestimo> emprestimos = repository.buscarTodos();
+
+        emprestimos.forEach(emprestimo -> {
+            respostaDtos.add(mapper.paraResposta(emprestimo));
+        });
+        return respostaDtos;
     }
 
     // buscar emprestimo de um usuário especifico
-    public Emprestimo listById(int id) throws SQLException {
-        List<Emprestimo> emprestimoList = repository.buscarTodos();
+    public CriacaoEmprestimoRespostaDto buscarPorId(int id) throws SQLException {
+        Emprestimo emprestimo = repository.buscarPorId(id);
 
-        for (Emprestimo e : emprestimoList){
-            if (e.getId() == id){
-                return repository.buscarPorId(id);
-            }
+        if (emprestimo == null){
+            throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
         }
-        throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
+        return mapper.paraResposta(repository.buscarPorId(id));
     }
 
-    // finalizar o emprestimo
-    public Emprestimo updateEmprestimoDevolucao (int id, Emprestimo emprestimo) throws SQLException {
-        List<Emprestimo> emprestimoList = repository.buscarTodos();
+    // finalizar o emprestimo // revisar o update do DTO do emprestimo
+    public CriacaoEmprestimoRespostaDto updateDevolucao (int id, CriacaoEmprestimoRequisicaoDto requisicaoDto) throws SQLException {
+        Emprestimo emprestimo = repository.buscarPorId(id);
 
-        emprestimo.setId(id);
-        for (Emprestimo e : emprestimoList){
-            if (e.getId() == id){
-                 repository.atualizarDevolucao(emprestimo);
-                 return emprestimo;
-            }
+        if (emprestimo == null){
+            throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
         }
-        throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
+
+        return mapper.paraResposta(repository.atualizarDevolucao(mapper.verificarEmprestimo(requisicaoDto, emprestimo)));
     }
 
     // deletar o emprestimo
-    public void deleteEmprestimo (int id) throws SQLException {
-        List<Emprestimo> emprestimoList = repository.buscarTodos();
-
-        for (Emprestimo e : emprestimoList){
-            if (e.getId() == id){
-                repository.deletar(id);
-                return;
-            }
+    public void delete (int id) throws SQLException {
+        if (!repository.existeEmprestimo(id)){
+            throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
         }
-        throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
+
+        repository.deletar(id);
     }
 
     // atualizar data prevista
-    public Emprestimo updateEmprestimo(int id, Emprestimo emprestimo) throws SQLException {
-        List<Emprestimo> emprestimoList = repository.buscarTodos();
+    public CriacaoEmprestimoRespostaDto updateEmprestimo(int id, CriacaoEmprestimoRequisicaoDto requisicaoDto) throws SQLException {
+        Emprestimo emprestimo = repository.buscarPorId(id);
 
-        emprestimo.setId(id);
-        for (Emprestimo e : emprestimoList){
-            if (e.getId() == id){
-                repository.atualizar(emprestimo);
-                return emprestimo;
-            }
+        if (emprestimo == null){
+            throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
         }
-        throw new RuntimeException("O emprestimo de ID " + id +  " não existe.");
+
+        return mapper.paraResposta(repository.atualizar(mapper.verificarEmprestimo(requisicaoDto, emprestimo)));
     }
 }

@@ -1,65 +1,71 @@
 package com.example.biblioteca.service;
 
+import com.example.biblioteca.dto.livro.CriacaoLivroRequisicaoDto;
+import com.example.biblioteca.dto.livro.CriacaoLivroRespostaDto;
+import com.example.biblioteca.mapper.LivroMapper;
 import com.example.biblioteca.model.Livro;
+import com.example.biblioteca.model.Usuario;
 import com.example.biblioteca.repository.LivroDAO;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class LivroService {
     private final LivroDAO repository;
+    private final LivroMapper mapper;
 
-    public LivroService(LivroDAO repository) {
+    public LivroService(LivroDAO repository, LivroMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     // criar livro
-    public Livro createLivro (Livro livro) throws SQLException {
-        return repository.insert(livro);
+    public CriacaoLivroRespostaDto create (CriacaoLivroRequisicaoDto requisicaoDto) throws SQLException {
+        return mapper.paraResposta(repository.insert(mapper.paraEntidade(requisicaoDto)));
     }
 
     // listar todos livros
-    public List<Livro> listLivro() throws SQLException {
-        return repository.buscarTodos();
+    public List<CriacaoLivroRespostaDto> buscarTodos() throws SQLException {
+        List<Livro> livros = repository.buscarTodos();
+
+        List<CriacaoLivroRespostaDto> respostaDtos = new ArrayList<>();
+
+        livros.forEach(livro -> {
+            respostaDtos.add(mapper.paraResposta(livro));
+        });
+
+        return respostaDtos;
     }
 
     // buscar por id
-    public Livro listById(int id) throws SQLException {
-        List<Livro> livroList = repository.buscarTodos();
+    public CriacaoLivroRespostaDto buscarPorId(int id) throws SQLException {
+        Livro livro = repository.buscarPorId(id);
 
-        for (Livro livro : livroList){
-            if (livro.getId() == id){
-                return repository.buscarPorId(id);
-            }
+        if (livro == null){
+            throw new RuntimeException("Livro ID " + id + " não encontrado!");
         }
-        throw new RuntimeException("O ID " + id + " do livro não existe.");
+        return mapper.paraResposta(repository.buscarPorId(id));
     }
 
     // atualizar o livro
-    public Livro updateLivro (int id, Livro livro) throws SQLException {
-        List<Livro> livroList = repository.buscarTodos();
+    public CriacaoLivroRespostaDto update (int id, CriacaoLivroRequisicaoDto requisicaoDto) throws SQLException {
+        Livro livro = repository.buscarPorId(id);
 
-        livro.setId(id);
-        for (Livro l : livroList){
-            if (l.getId() == id){
-                repository.atualizar(livro);
-                return livro;
-            }
+        if (livro == null){
+            throw new RuntimeException("Livro ID " + id + " não encontrado!");
         }
-        throw new RuntimeException("O ID " + id + " do livro não existe.");
+
+        return mapper.paraResposta(repository.atualizar(mapper.verificacaoUpdate(requisicaoDto, livro)));
     }
 
     // deletar livro
-    public void deleteLivro (int id) throws SQLException {
-        List<Livro> livroList = repository.buscarTodos();
-        for (Livro livro : livroList){
-            if (livro.getId() == id){
-                repository.deletar(id);
-                return;
-            }
+    public void delete (int id) throws SQLException {
+        if (!repository.livroExiste(id)){
+            throw new RuntimeException("Livro ID " + id + " não encontrado!");
         }
-        throw new RuntimeException("O ID " + id + " do livro não existe.");
+        repository.deletar(id);
     }
 }

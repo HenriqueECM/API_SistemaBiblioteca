@@ -78,7 +78,23 @@ public class LivroDAO {
         return new Livro(newId, titulo, autor, anoPublicacao);
     }
 
-    public void atualizar (Livro livro) throws SQLException {
+    public boolean livroExiste(int id) throws SQLException {
+        String query = "SELECT id FROM livro WHERE id = ?";
+
+        try (Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(query)){
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Livro atualizar (Livro livro) throws SQLException {
         String query = "UPDATE livro SET titulo = ?, autor = ?, ano_publicacao = ? WHERE id = ?";
 
         try (Connection conn = Conexao.conectar();
@@ -92,6 +108,7 @@ public class LivroDAO {
 
             System.out.println("Livro atualizado com sucesso!");
         }
+        return livro;
     }
 
     public void deletar (int id) throws SQLException {

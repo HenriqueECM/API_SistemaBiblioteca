@@ -5,7 +5,6 @@ import com.example.biblioteca.model.Emprestimo;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,9 +94,23 @@ public class EmprestimoDAO {
         return emprestimo;
     }
 
+    public boolean existeEmprestimo (int id) throws SQLException {
+        String query = "SELECT id FROM emprestimo WHERE id = ?";
+
+        try (Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()){
+                return true;
+            }
+        }
+        return false;
+    }
 
     // para mudar data prevista
-    public void atualizar (Emprestimo emprestimo) throws SQLException {
+    public Emprestimo atualizar (Emprestimo emprestimo) throws SQLException {
         String query = "UPDATE emprestimo SET data_emprestimo = ? WHERE id = ?";
 
         try (Connection conn = Conexao.conectar();
@@ -109,10 +122,11 @@ public class EmprestimoDAO {
 
             System.out.println("Emprestimo atualizado com sucesso!");
         }
+        return emprestimo;
     }
 
     // para registrar a devolução
-    public void atualizarDevolucao (Emprestimo emprestimo) throws SQLException {
+    public Emprestimo atualizarDevolucao (Emprestimo emprestimo) throws SQLException {
         String query = "UPDATE emprestimo SET data_devolucao = ? WHERE id = ?";
 
         try (Connection conn = Conexao.conectar();
@@ -124,6 +138,7 @@ public class EmprestimoDAO {
 
             System.out.println("Emprestimo atualizado com sucesso!");
         }
+        return emprestimo;
     }
 
     public void deletar (int id) throws SQLException {
