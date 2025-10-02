@@ -1,5 +1,7 @@
 package com.example.biblioteca.controller;
 
+import com.example.biblioteca.dto.dataDevDto.DataDevRequisicaoDto;
+import com.example.biblioteca.dto.dataDevDto.DataEmpRequisicaoDto;
 import com.example.biblioteca.dto.emprestimo.CriacaoEmprestimoRequisicaoDto;
 import com.example.biblioteca.dto.emprestimo.CriacaoEmprestimoRespostaDto;
 import com.example.biblioteca.dto.livro.CriacaoLivroRespostaDto;
@@ -25,7 +27,7 @@ public class EmprestimoController {
 
     // criar o emprestimo - teste ok
     @PostMapping
-    public ResponseEntity <CriacaoEmprestimoRespostaDto> createEmprestimo (@RequestBody CriacaoEmprestimoRequisicaoDto requisicaoEmprestimo){
+    public ResponseEntity <CriacaoEmprestimoRespostaDto> create (@RequestBody CriacaoEmprestimoRequisicaoDto requisicaoEmprestimo){
         try{
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(service.create(requisicaoEmprestimo));
@@ -38,8 +40,8 @@ public class EmprestimoController {
 
     // listar todos emprestimos - teste ok
     @GetMapping
-    public ResponseEntity <List<CriacaoEmprestimoRespostaDto>> getEmprestimo(){
-        try{
+    public ResponseEntity <List<CriacaoEmprestimoRespostaDto>> buscarTodos(){
+        try {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(service.buscarTodos());
         } catch (SQLException e){
@@ -52,7 +54,7 @@ public class EmprestimoController {
 
     // busca por id
     @GetMapping("/{id}")
-    public ResponseEntity <CriacaoEmprestimoRespostaDto> getById(@PathVariable int id){
+    public ResponseEntity <CriacaoEmprestimoRespostaDto> buscarPorId(@PathVariable int id){
         try {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(service.buscarPorId(id));
@@ -63,13 +65,25 @@ public class EmprestimoController {
         }
     }
 
-    // vai alterar a data prevista
-    @PutMapping("/{id}/emprestimo")
-    // quando so vou atualizar data somente, colocar void, pois com return ele retorna o "objeto"
-    public ResponseEntity <CriacaoEmprestimoRespostaDto> updateEmprestimo (@PathVariable int id, @RequestBody CriacaoEmprestimoRequisicaoDto requisicaoEmprestimo){
+    @GetMapping("/usuarios/{id}/emprestimos")
+    public ResponseEntity <List<CriacaoEmprestimoRespostaDto>> buscarEmprestimosPorUsuario(@PathVariable int id){
         try {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(service.updateEmprestimo(id,requisicaoEmprestimo));
+                    .body(service.buscarEmprestimosPorUsuario(id));
+        } catch (SQLException e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    // vai alterar a data prevista
+    @PutMapping("/{id}/emprestimo")
+    public ResponseEntity <Void> updateEmprestimo (@PathVariable int id, @RequestBody DataEmpRequisicaoDto dataEmpRequisicaoDto){
+        try {
+            service.updateEmprestimo(id, dataEmpRequisicaoDto);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .build();
         } catch (SQLException e){
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -79,10 +93,12 @@ public class EmprestimoController {
 
     // vai alterar a data devolução
     @PutMapping("/{id}/devolucao")
-    public ResponseEntity <CriacaoEmprestimoRespostaDto> updateEmprestimoDevolucao(@PathVariable int id, @RequestBody CriacaoEmprestimoRequisicaoDto requisicaoEmprestimo){
+    public ResponseEntity <Void> updateDevolucao(@PathVariable int id, @RequestBody DataDevRequisicaoDto dataDevRequisicaoDto){
         try {
+            service.updateDevolucao(id, dataDevRequisicaoDto);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(service.updateDevolucao(id,requisicaoEmprestimo));
+                    // coloco build pois não estou retornando um valor, ou seja utilizando Void
+                    .build();
         } catch (SQLException e){
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -92,7 +108,7 @@ public class EmprestimoController {
 
     // deletar o emprestimo - teste ok
     @DeleteMapping("/{id}")
-    public ResponseEntity <Void> deleteEmprestimo (@PathVariable int id){
+    public ResponseEntity <Void> delete (@PathVariable int id){
         try {
             service.delete(id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT)
